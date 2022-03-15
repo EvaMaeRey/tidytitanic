@@ -4,8 +4,11 @@
 #'
 #' @format A data frame with 2201 rows and 5 variables:
 #' \describe{
-#'   \item{price}{price, in US dollars}
-#'   \item{carat}{weight of the diamond, in carats}
+#'   \item{age}{price, in US dollars}
+#'   \item{class}{weight of the diamond, in carats}
+#'   \item{sex}{weight of the diamond, in carats}
+#'   \item{survived}{weight of the diamond, in carats}
+#'   \item{id}{weight of the diamond, in carats}
 #'   ...
 #' }
 #' @source R stat
@@ -18,8 +21,12 @@
 #'
 #' @format A data frame with 32 rows and 5 variables:
 #' \describe{
-#'   \item{price}{price, in US dollars}
-#'   \item{carat}{weight of the diamond, in carats}
+#'   \item{age}{price, in US dollars}
+#'   \item{class}{weight of the diamond, in carats}
+#'   \item{freq}{weight of the diamond, in carats}
+#'   \item{sex}{weight of the diamond, in carats}
+#'   \item{survived}{weight of the diamond, in carats}
+
 #'   ...
 #' }
 #' @source \url{http://www.diamondse.info/}
