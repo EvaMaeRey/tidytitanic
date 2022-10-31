@@ -1,13 +1,13 @@
 Package: tidytitanic
-Title: Data package with tidy versions of R Titanic data
+Title: Data package with tidy, flat versions of R Titanic data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Evangeline",
            family = "Reynolds",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "evangeline.mae@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: This package gives you that tidy data based on the Titanic data in R.
+Description: This package gives you that tidy data based on the Titanic data from 'datasets' in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

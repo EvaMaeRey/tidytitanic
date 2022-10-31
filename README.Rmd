@@ -1,0 +1,151 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# tidytitanic
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+## Goal 1. tidy data
+
+The goal of tidytitanic provide 'flat' versions of the Titanic dataset which is available in R.  See how to use in 'Step 2. Imagine Another Way' in the Package development Guide below. 
+
+## Goal 2. package development practice
+
+This repository is also intended to introduce the data package building process. {tidytitanic} was the 'toy' project I used as a practice for creating a larger data package with collaborators. I made use of the data section of the R Packages book `https://r-pkgs.org/data.html` to get up and running.
+
+Now, I'd like to introduce this 'toy' package as a point of entry for others to get into package development.
+
+Here some motivation:
+
+1. **Data packages are fun to make.**
+2. **Data packages are 'safe'.**  They don't require much API design (sometimes it is a good idea to take longer time w/ functions to develop API); we might expect less drift in API.  
+3. **Data packages are packages!** Building a data package covers a lot of the same ground as building other types of R packages.  So knowledge can be transferred to 'function-type' packages. 
+4. **Data packages are impactful.** And delivering easy-to-use data can help people get to the rewarding, fun things (cool analytics/modeling/visualization) faster. And, if you are a cool cat/rare bird that loves data cleaning, you get to do that in the package build! (see 1.)
+
+# Package development practice 
+
+## Step 1. Identify a problem
+
+The `Titanic` dataset from R's {datasets} package is compelling and familiar data. But it is hard to get going with using popular tools because it is in an array.  It's not many steps to  flatten and clean it, but this takes a few steps which might distract you from the main goals of using it as an example.  A package seems worthwhile to provide flat data.  A ready-to-go uncounted version may also be useful in demoing operations on 'individual' or 'record' level data.
+
+Here are the steps to flattening and then uncounting:
+
+```{r example}
+library(magrittr)
+my_titanic <- Titanic %>% 
+  data.frame() %>% 
+  janitor::clean_names() %>% 
+  tidyr::uncount(freq) %>% 
+  tibble::tibble()
+
+head(my_titanic)
+```
+
+## Step 2. Imagine another way!
+
+What if you just installed a package that had all of this work done for you?  How great would that be!
+
+### Installation
+
+{tidytitanic} is a real data package.  So first let's see how we'd use it.
+
+You can install development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("EvaMaeRey/tidytitanic")
+```
+
+
+### So, what can the package {tidytitanic} do for you?
+
+Think about the API that you'd like to have for your package.
+
+Since {tidytitanic} is a real package, we can look at that api.  It delivers flat data and uncounted data.
+
+Let's see how to use it ...
+
+```{r}
+library(tidytitanic)
+
+head(flat_titanic)
+head(tidy_titanic)
+```
+
+
+
+## Step 3. Build a data package!
+
+Let's look ahead to the main work that has to be done in package building before we begin.
+
+### What's inside, A. Prepping data
+
+For this package, preparation happens in the `data-raw` folder, in a file called `dataset_prep`.  
+
+```{r}
+prep <- readLines("data-raw/dataset_prep.R")
+```
+
+Quoting these here. It looks a lot like the data cleaning shown in our 'Step 0' problem statement.
+
+```{r, code = prep, eval = F}
+```
+
+usethis::use_data() on an object prepares a .rda file and saves it in 'data' folder.
+
+
+### What's inside, B. Making data available to package users.
+
+Then we need to make data available to users.  We do this in the R folder, in a file called datasets_export.
+
+```{r}
+export <- readLines("R/dataset_export.R")
+```
+
+Quoting these here:
+
+```{r, code = export, eval = F}
+```
+
+
+---
+
+### What's inside C.  The rest of the architecture. 
+
+Ultimately you'll have a fair number of files supporting the project.  I'm using fs::dir_tree() to have a look at all the project files.
+
+```{r, comment = ''}
+fs::dir_tree(recurse = T)
+```
+
+See details on how [here](https://evamaerey.github.io/package_in_20_minutes/package_in_20_minutes#step-00-press-play-on-the-video-guide).  The good news is, you only have to edit 'Description', 'readme.Rmd' and the files that have the .R extension (the two quoted above)!
+
+In this workshop, we'll see that:
+
+- usethis::create_package() helps us create the basic package architecture
+- devtools::document() creates the man folder and the .Rd files
+- usethis::use_readme_rmd() helps us create the readme file (then we 'knit' to create the .md version)
+- usethis::use_data() on an object prepares a .rda file and saves it in 'data'
+... more to add...
+
+
+## Step 4. Check and take your package for a spin!
+
+## Step 5. Done! Celebrate!
+
+## Step 6. Think about outreach, CRAN, and futher development
+
+Particularly impactful data packages usually do more to get the word out about the work they do.  In the package repository, more work and items may be included to support this.  Check out {palmerpenguins} and {gapminder} to see this. You also might want to get your package on CRAN!
