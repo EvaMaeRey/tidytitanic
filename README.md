@@ -137,7 +137,7 @@ prep <- readLines("data-raw/dataset_prep.R")
 ```
 
 Quoting these here. It looks a lot like the data cleaning shown in our
-‘Step 0’ problem statement.
+‘Step 1’, the problem statement.
 
 ``` r
 library(tidyverse)

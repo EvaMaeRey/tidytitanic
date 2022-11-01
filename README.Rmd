@@ -99,7 +99,7 @@ For this package, preparation happens in the `data-raw` folder, in a file called
 prep <- readLines("data-raw/dataset_prep.R")
 ```
 
-Quoting these here. It looks a lot like the data cleaning shown in our 'Step 0' problem statement.
+Quoting these here. It looks a lot like the data cleaning shown in our 'Step 1', the problem statement.
 
 ```{r, code = prep, eval = F}
 ```
