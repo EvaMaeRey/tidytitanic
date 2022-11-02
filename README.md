@@ -266,3 +266,8 @@ about the work they do. In the package repository, more work and items
 may be included to support this. Check out {palmerpenguins} and
 {gapminder} to see this. You also might want to get your package on
 CRAN\!
+
+Check out the work that was done in {palmerpenguins} for comparison, in
+this [fork](https://github.com/EvaMaeRey/palmerpenguins), with the
+readme modified to highlight data prep and delivery and package
+structure.
