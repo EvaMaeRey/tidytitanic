@@ -26,7 +26,7 @@ others to get into package development.
 
 Here some motivation:
 
-1.  **Data packages are fun to make.**
+1.  **Data packages are fun to make\!**
 2.  **Data packages are ‘safe’.** They don’t require much API design
     (sometimes it is a good idea to take longer time w/ functions to
     develop API); we might expect less drift in API.  
@@ -37,7 +37,7 @@ Here some motivation:
     help people get to the rewarding, fun things (cool
     analytics/modeling/visualization) faster. And, if you are a cool
     cat/rare bird that loves data cleaning, you get to do that in the
-    package build\! (see 1.)
+    package build\! (see 1\!)
 
 # Package development practice
 
