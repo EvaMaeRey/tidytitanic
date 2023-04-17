@@ -17,9 +17,11 @@ tidy_titanic %>% filter(class != "Crew")
 usethis::use_data(tidy_titanic, overwrite = TRUE)
 usethis::use_data(flat_titanic, overwrite = TRUE)
 
-# added https://github.com/clauswilke/dviz.supp/blob/master/data/titanic_all.rda as well
 # added passenger_detail
 
+download.file(url = "https://github.com/clauswilke/dviz.supp/raw/master/data/titanic_all.rda",
+  destfile = "data-raw/titanic_all.rda")
+load("data-raw/titanic_all.rda")
 passengers <- titanic_all
 save(passengers, file = "data/passengers.rda")
 usethis::use_data(passengers, overwrite = TRUE)
