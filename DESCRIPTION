@@ -5,13 +5,12 @@ Authors@R:
     person(given = "Evangeline",
            family = "Reynolds",
            role = c("aut", "cre"),
-           email = "evangeline.mae@gmail.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: This package gives you that tidy data based on the Titanic data from 'datasets' in R.
+           email = "evangeline.mae@gmail.com")
+Description: This package gives you that 'tidy data' based on the Titanic data from 'datasets' in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)

@@ -4,102 +4,59 @@
 # tidytitanic
 
 <!-- badges: start -->
-
 <!-- badges: end -->
-
-## Goal 1. tidy data
-
-The goal of tidytitanic provide ‘flat’ versions of the Titanic dataset
-which is available in R. See how to use in ‘Step 2. Imagine Another Way’
-in the Package development Guide below.
-
-## Goal 2. package development practice
-
-This repository is also intended to introduce the data package building
-process. {tidytitanic} was the ‘toy’ project I used as a practice for
-creating a larger data package with collaborators. I made use of the
-data section of the R Packages book `https://r-pkgs.org/data.html` to
-get up and running.
-
-Now, I’d like to introduce this ‘toy’ package as a point of entry for
-others to get into package development.
-
-Here some motivation:
-
-1.  **Data packages are fun to make\!**
-2.  **Data packages are ‘safe’.** They don’t require much API design
-    (sometimes it is a good idea to take longer time w/ functions to
-    develop API); we might expect less drift in API.  
-3.  **Data packages are packages\!** Building a data package covers a
-    lot of the same ground as building other types of R packages. So
-    knowledge can be transferred to ‘function-type’ packages.
-4.  **Data packages are impactful.** And delivering easy-to-use data can
-    help people get to the rewarding, fun things (cool
-    analytics/modeling/visualization) faster. And, if you are a cool
-    cat/rare bird that loves data cleaning, you get to do that in the
-    package build\! (see 1\!)
-
-# Package development practice
-
-## Step 1. Identify a problem
-
-The `Titanic` dataset from R’s {datasets} package is compelling and
-familiar data. But it is hard to get going with using popular tools
-because it is in an array. It’s not many steps to flatten and clean it,
-but this takes a few steps which might distract you from the main goals
-of using it as an example. A package seems worthwhile to provide flat
-data. A ready-to-go uncounted version may also be useful in demoing
-operations on ‘individual’ or ‘record’ level data.
-
-Here are the steps to flattening and then uncounting:
-
-``` r
-library(magrittr)
-#> Warning: package 'magrittr' was built under R version 3.6.2
-my_titanic <- Titanic %>% 
-  data.frame() %>% 
-  janitor::clean_names() %>% 
-  tidyr::uncount(freq) %>% 
-  tibble::tibble()
-
-head(my_titanic)
-#> # A tibble: 6 × 4
-#>   class sex   age   survived
-#>   <fct> <fct> <fct> <fct>   
-#> 1 3rd   Male  Child No      
-#> 2 3rd   Male  Child No      
-#> 3 3rd   Male  Child No      
-#> 4 3rd   Male  Child No      
-#> 5 3rd   Male  Child No      
-#> 6 3rd   Male  Child No
-```
-
-## Step 2. Imagine another way\!
-
-What if you just installed a package that had all of this work done for
-you? How great would that be\!
-
-### Installation
-
-{tidytitanic} is a real data package. So first let’s see how we’d use
-it.
 
 You can install development version from [GitHub](https://github.com/)
 with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("EvaMaeRey/tidytitanic")
+# install.packages("remotes")
+remotes::install_github("EvaMaeRey/tidytitanic")
 ```
 
-### So, what can the package {tidytitanic} do for you?
+``` r
+library(tidytitanic)
+tidy_titanic |> head()
+#>   id class  sex   age survived
+#> 1  1   3rd Male Child       No
+#> 2  2   3rd Male Child       No
+#> 3  3   3rd Male Child       No
+#> 4  4   3rd Male Child       No
+#> 5  5   3rd Male Child       No
+#> 6  6   3rd Male Child       No
 
-Think about the API that you’d like to have for your package.
+flat_titanic |> head()
+#>   class    sex   age survived freq
+#> 1   1st   Male Child       No    0
+#> 2   2nd   Male Child       No    0
+#> 3   3rd   Male Child       No   35
+#> 4  Crew   Male Child       No    0
+#> 5   1st Female Child       No    0
+#> 6   2nd Female Child       No    0
 
-Since {tidytitanic} is a real package, we can look at that api. It
-delivers flat data and uncounted data.
-
-Let’s see how to use it …
+passengers |> head()
+#>   passenger_id survived pclass
+#> 1            1        0      3
+#> 2            2        1      1
+#> 3            3        1      3
+#> 4            4        1      1
+#> 5            5        0      3
+#> 6            6        0      3
+#>                                                  name    sex age sib_sp parch
+#> 1                             Braund, Mr. Owen Harris   male  22      1     0
+#> 2 Cumings, Mrs. John Bradley (Florence Briggs Thayer) female  38      1     0
+#> 3                              Heikkinen, Miss. Laina female  26      0     0
+#> 4        Futrelle, Mrs. Jacques Heath (Lily May Peel) female  35      1     0
+#> 5                            Allen, Mr. William Henry   male  35      0     0
+#> 6                                    Moran, Mr. James   male  NA      0     0
+#>             ticket    fare cabin embarked
+#> 1        A/5 21171  7.2500              S
+#> 2         PC 17599 71.2833   C85        C
+#> 3 STON/O2. 3101282  7.9250              S
+#> 4           113803 53.1000  C123        S
+#> 5           373450  8.0500              S
+#> 6           330877  8.4583              Q
+```
 
 ``` r
 library(tidytitanic)
@@ -113,19 +70,36 @@ head(flat_titanic)
 #> 5   1st Female Child       No    0
 #> 6   2nd Female Child       No    0
 head(tidy_titanic)
-#>     id class  sex   age survived
-#> 3    1   3rd Male Child       No
-#> 3.1  2   3rd Male Child       No
-#> 3.2  3   3rd Male Child       No
-#> 3.3  4   3rd Male Child       No
-#> 3.4  5   3rd Male Child       No
-#> 3.5  6   3rd Male Child       No
+#>   id class  sex   age survived
+#> 1  1   3rd Male Child       No
+#> 2  2   3rd Male Child       No
+#> 3  3   3rd Male Child       No
+#> 4  4   3rd Male Child       No
+#> 5  5   3rd Male Child       No
+#> 6  6   3rd Male Child       No
+head(passengers)
+#>   passenger_id survived pclass
+#> 1            1        0      3
+#> 2            2        1      1
+#> 3            3        1      3
+#> 4            4        1      1
+#> 5            5        0      3
+#> 6            6        0      3
+#>                                                  name    sex age sib_sp parch
+#> 1                             Braund, Mr. Owen Harris   male  22      1     0
+#> 2 Cumings, Mrs. John Bradley (Florence Briggs Thayer) female  38      1     0
+#> 3                              Heikkinen, Miss. Laina female  26      0     0
+#> 4        Futrelle, Mrs. Jacques Heath (Lily May Peel) female  35      1     0
+#> 5                            Allen, Mr. William Henry   male  35      0     0
+#> 6                                    Moran, Mr. James   male  NA      0     0
+#>             ticket    fare cabin embarked
+#> 1        A/5 21171  7.2500              S
+#> 2         PC 17599 71.2833   C85        C
+#> 3 STON/O2. 3101282  7.9250              S
+#> 4           113803 53.1000  C123        S
+#> 5           373450  8.0500              S
+#> 6           330877  8.4583              Q
 ```
-
-## Step 3. Build a data package\!
-
-Let’s look ahead to the main work that has to be done in package
-building before we begin.
 
 ### What’s inside, A. Prepping data
 
@@ -133,141 +107,130 @@ For this package, preparation happens in the `data-raw` folder, in a
 file called `dataset_prep`.
 
 ``` r
-prep <- readLines("data-raw/dataset_prep.R")
-```
+flat_titanic <- Titanic |>
+  data.frame() |>
+  janitor::clean_names() |>
+  tibble::tibble()
 
-Quoting these here. It looks a lot like the data cleaning shown in our
-‘Step 1’, the problem statement.
+usethis::use_data(flat_titanic, overwrite = T)
+#> ✔ Setting active project to '/Users/evangelinereynolds/Google Drive/r_packages/tidytitanic'
+#> ✔ Saving 'flat_titanic' to 'data/flat_titanic.rda'
+#> • Document your data (see 'https://r-pkgs.org/data.html')
 
-``` r
 library(tidyverse)
+#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+#> ✔ dplyr     1.1.4          ✔ readr     2.1.5     
+#> ✔ forcats   1.0.0          ✔ stringr   1.5.1     
+#> ✔ ggplot2   3.5.1.9000     ✔ tibble    3.2.1     
+#> ✔ lubridate 1.9.3          ✔ tidyr     1.3.1     
+#> ✔ purrr     1.0.2          
+#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+#> ✖ dplyr::filter() masks stats::filter()
+#> ✖ dplyr::lag()    masks stats::lag()
+#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+tidy_titanic <- Titanic |>
+  data.frame() |>
+  janitor::clean_names()|>
+  uncount(weights = freq) |>
+  mutate(id = 1:n(), .before = 1) |>
+  remove_rownames() |>
+  tibble()
 
-Titanic %>%
-  data.frame() %>%
-  janitor::clean_names() %>%
-  tibble() ->
-  flat_titanic
+usethis::use_data(tidy_titanic, overwrite = T)
+#> ✔ Saving 'tidy_titanic' to 'data/tidy_titanic.rda'
+#> • Document your data (see 'https://r-pkgs.org/data.html')
 
-Titanic %>%
-  data.frame() %>%
-  janitor::clean_names()%>%
-  uncount(weights = freq) %>%
-  mutate(id = 1:n(), .before = 1) %>%
-  tibble::remove_rownames() %>%
-  tibble() ->
-  tidy_titanic
 
-usethis::use_data(flat_titanic, overwrite = TRUE)
-usethis::use_data(tidy_titanic, overwrite = TRUE)
+passengers <- bind_rows(titanic::titanic_train, 
+          titanic::titanic_test) |>
+  janitor::clean_names() 
+
+usethis::use_data(passengers, overwrite = T)
+#> ✔ Saving 'passengers' to 'data/passengers.rda'
+#> • Document your data (see 'https://r-pkgs.org/data.html')
 ```
 
-usethis::use\_data() on an object prepares a .rda file and saves it in
-‘data’ folder.
-
-### What’s inside, B. Making data available to package users.
-
-Then we need to make data available to users. We do this in the R
-folder, in a file called datasets\_export.
+# document data
 
 ``` r
-export <- readLines("R/dataset_export.R")
-```
 
-Quoting these here:
 
-``` r
-#' Records for individuals on titanic.
+#' Tallied characteristics
 #'
-#' A dataset with a row for each individual on the titanic
-#'
-#' @format A data frame with 2201 rows and 5 variables:
-#' \describe{
-#'   \item{id}{an arbitrary id for each individual}
-#'   \item{class}{1st, 2nd, 3rd for each passenger}
-#'   \item{sex}{Male, Female for each passenger}
-#'   \item{age}{Child, Adult for each passenger}
-#'   \item{survived}{No, Yes for each passenger}
-#'   ...
-#' }
-#' @source A version of the Titanic data from the datasets package
-"tidy_titanic"
-
-
-#' Counts for combinations of characteristics of the individuals on the Titanic.
-#'
-#' A dataset with a row for each combination of characteristics of individuals on the Titanic.
+#' A dataset tallying frequencies of titanic passenger characteristics based on Titanic data from base R.  Includes Crew
 #'
 #' @format A data frame with 32 rows and 5 variables:
 #' \describe{
-#'   \item{class}{1st, 2nd, 3rd for each passenger}
-#'   \item{sex}{Male, Female for each passenger}
-#'   \item{age}{Child, Adult for each passenger}
-#'   \item{survived}{No, Yes for each passenger}
-#'   \item{freq}{count of individuals}
+#'   \item{class}{class (1st, 2nd, 3rd or Crew)}
+#'   \item{sex}{sex of passenger}
+#'   \item{age}{child or adult}
+#'   \item{survived}{survival outcome of passanger}
+#'   \item{freq}{tally of all in category}
+#'   ...
+#' }
+#' @source R stats
+"flat_titanic"
+#> [1] "flat_titanic"
+
+
+#' 
+#'
+#' A dataset titanic passengers and characteristics based on Titanic data from base R.  Includes Crew
+#'
+#' @format A data frame with 2201 rows and 5 variables:
+#' \describe{
+#'   \item{id}{an id for each passenger}
+#'   \item{class}{class (1st, 2nd, 3rd or Crew)}
+#'   \item{sex}{sex of passenger}
+#'   \item{age}{child or adult}
+#'   \item{survived}{survival outcome of passanger}
 
 #'   ...
 #' }
-#' @source A version of the Titanic data from the datasets package
-"flat_titanic"
+#' @source R stats
+"tidy_titanic"
+#> [1] "tidy_titanic"
+
+
+
+#' Titanic test data.
+#'
+#' @format Data frame with columns
+#' \describe{
+#' \item{passenger_id}{Passenger ID}
+#' \item{survived}{survival status}
+#' \item{pclass}{Passenger Class}
+#' \item{name}{Name}
+#' \item{sex}{Sex}
+#' \item{age}{Age}
+#' \item{sib_sp}{Number of Siblings/Spouses Aboard}
+#' \item{parch}{Number of Parents/Children Aboard}
+#' \item{ticket}{Ticket Number}
+#' \item{fare}{Passenger Fare}
+#' \item{cabin}{Cabin}
+#' \item{embarked}{Port of Embarkation}
+#' 
+#' ...
+#' }
+#' @source titanic package, https://www.kaggle.com/c/titanic/data
+"passengers"
+#> [1] "passengers"
 ```
 
------
-
-### What’s inside C. The rest of the architecture.
-
-Ultimately you’ll have a fair number of files supporting the project.
-I’m using fs::dir\_tree() to have a look at all the project files.
+titanic is an R package containing data sets providing information on
+the fate of passengers on the fatal maiden voyage of the ocean liner
+“Titanic”, with variables such as economic status (class), sex, age and
+survival. These data sets are often used as an introduction to machine
+learning on Kaggle. More details about the competition can be found
+here, and the original data sets can be found here.
 
 ``` r
-fs::dir_tree(recurse = T)
-.
-├── DESCRIPTION
-├── LICENSE
-├── LICENSE.md
-├── NAMESPACE
-├── R
-│   └── dataset_export.R
-├── README.Rmd
-├── README.md
-├── data
-│   ├── flat_titanic.rda
-│   └── tidy_titanic.rda
-├── data-raw
-│   └── dataset_prep.R
-├── man
-│   ├── flat_titanic.Rd
-│   └── tidy_titanic.Rd
-└── tidytitanic.Rproj
+knitrExtra::chunk_to_dir("data_documentation", dir = "R")
+#> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
 ```
 
-See details on how
-[here](https://evamaerey.github.io/package_in_20_minutes/package_in_20_minutes#step-00-press-play-on-the-video-guide).
-The good news is, you only have to edit ‘Description’, ‘readme.Rmd’ and
-the files that have the .R extension (the two quoted above)\!
-
-In this workshop, we’ll see that:
-
-  - usethis::create\_package() helps us create the basic package
-    architecture
-  - devtools::document() creates the man folder and the .Rd files
-  - usethis::use\_readme\_rmd() helps us create the readme file (then we
-    ‘knit’ to create the .md version)
-  - usethis::use\_data() on an object prepares a .rda file and saves it
-    in ‘data’ … more to add…
-
-## Step 4. Check and take your package for a spin\!
-
-## Step 5. Done\! Celebrate\!
-
-## Step 6. Think about outreach, CRAN, and futher development
-
-Particularly impactful data packages usually do more to get the word out
-about the work they do. In the package repository, more work and items
-may be included to support this. Check out {palmerpenguins} and
-{gapminder} to see this. You also might want to get your package on
-CRAN\!
-
-Check out the work that was done in {palmerpenguins} for comparison, in
-this [fork](https://github.com/EvaMaeRey/palmerpenguins), with the
-readme modified to highlight data prep and delivery and package
-structure.
+``` r
+devtools::document()
+devtools::check()
+devtools::install(".", upgrade = "never")
+```

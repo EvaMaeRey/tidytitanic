@@ -18,136 +18,143 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-## Goal 1. tidy data
-
-The goal of tidytitanic provide 'flat' versions of the Titanic dataset which is available in R.  See how to use in 'Step 2. Imagine Another Way' in the Package development Guide below. 
-
-## Goal 2. package development practice
-
-This repository is also intended to introduce the data package building process. {tidytitanic} was the 'toy' project I used as a practice for creating a larger data package with collaborators. I made use of the data section of the R Packages book `https://r-pkgs.org/data.html` to get up and running.
-
-Now, I'd like to introduce this 'toy' package as a point of entry for others to get into package development.
-
-Here some motivation:
-
-1. **Data packages are fun to make!**
-2. **Data packages are 'safe'.**  They don't require much API design (sometimes it is a good idea to take longer time w/ functions to develop API); we might expect less drift in API.  
-3. **Data packages are packages!** Building a data package covers a lot of the same ground as building other types of R packages.  So knowledge can be transferred to 'function-type' packages. 
-4. **Data packages are impactful.** And delivering easy-to-use data can help people get to the rewarding, fun things (cool analytics/modeling/visualization) faster. And, if you are a cool cat/rare bird that loves data cleaning, you get to do that in the package build! (see 1!)
-
-# Package development practice 
-
-## Step 1. Identify a problem
-
-The `Titanic` dataset from R's {datasets} package is compelling and familiar data. But it is hard to get going with using popular tools because it is in an array.  It's not many steps to  flatten and clean it, but this takes a few steps which might distract you from the main goals of using it as an example.  A package seems worthwhile to provide flat data.  A ready-to-go uncounted version may also be useful in demoing operations on 'individual' or 'record' level data.
-
-Here are the steps to flattening and then uncounting:
-
-```{r example}
-library(magrittr)
-my_titanic <- Titanic %>% 
-  data.frame() %>% 
-  janitor::clean_names() %>% 
-  tidyr::uncount(freq) %>% 
-  tibble::tibble()
-
-head(my_titanic)
-```
-
-## Step 2. Imagine another way!
-
-What if you just installed a package that had all of this work done for you?  How great would that be!
-
-### Installation
-
-{tidytitanic} is a real data package.  So first let's see how we'd use it.
-
 You can install development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("EvaMaeRey/tidytitanic")
+# install.packages("remotes")
+remotes::install_github("EvaMaeRey/tidytitanic")
 ```
 
 
-### So, what can the package {tidytitanic} do for you?
+```{r example}
+library(tidytitanic)
+tidy_titanic |> head()
 
-Think about the API that you'd like to have for your package.
+flat_titanic |> head()
 
-Since {tidytitanic} is a real package, we can look at that api.  It delivers flat data and uncounted data.
+passengers |> head()
+```
 
-Let's see how to use it ...
 
 ```{r}
 library(tidytitanic)
 
 head(flat_titanic)
 head(tidy_titanic)
+head(passengers)
 ```
 
 
-
-## Step 3. Build a data package!
-
-Let's look ahead to the main work that has to be done in package building before we begin.
 
 ### What's inside, A. Prepping data
 
 For this package, preparation happens in the `data-raw` folder, in a file called `dataset_prep`.  
 
 ```{r}
-prep <- readLines("data-raw/dataset_prep.R")
+flat_titanic <- Titanic |>
+  data.frame() |>
+  janitor::clean_names() |>
+  tibble::tibble()
+
+usethis::use_data(flat_titanic, overwrite = T)
+
+library(tidyverse)
+tidy_titanic <- Titanic |>
+  data.frame() |>
+  janitor::clean_names()|>
+  uncount(weights = freq) |>
+  mutate(id = 1:n(), .before = 1) |>
+  remove_rownames() |>
+  tibble()
+
+usethis::use_data(tidy_titanic, overwrite = T)
+
+
+passengers <- bind_rows(titanic::titanic_train, 
+          titanic::titanic_test) |>
+  janitor::clean_names() 
+
+usethis::use_data(passengers, overwrite = T)
 ```
 
-Quoting these here. It looks a lot like the data cleaning shown in our 'Step 1', the problem statement.
 
-```{r, code = prep, eval = F}
+# document data
+
+```{r data_documentation}
+
+
+#' Tallied characteristics
+#'
+#' A dataset tallying frequencies of titanic passenger characteristics based on Titanic data from base R.  Includes Crew
+#'
+#' @format A data frame with 32 rows and 5 variables:
+#' \describe{
+#'   \item{class}{class (1st, 2nd, 3rd or Crew)}
+#'   \item{sex}{sex of passenger}
+#'   \item{age}{child or adult}
+#'   \item{survived}{survival outcome of passanger}
+#'   \item{freq}{tally of all in category}
+#'   ...
+#' }
+#' @source R stats
+"flat_titanic"
+
+
+#' 
+#'
+#' A dataset titanic passengers and characteristics based on Titanic data from base R.  Includes Crew
+#'
+#' @format A data frame with 2201 rows and 5 variables:
+#' \describe{
+#'   \item{id}{an id for each passenger}
+#'   \item{class}{class (1st, 2nd, 3rd or Crew)}
+#'   \item{sex}{sex of passenger}
+#'   \item{age}{child or adult}
+#'   \item{survived}{survival outcome of passanger}
+
+#'   ...
+#' }
+#' @source R stats
+"tidy_titanic"
+
+
+
+#' Titanic test data.
+#'
+#' @format Data frame with columns
+#' \describe{
+#' \item{passenger_id}{Passenger ID}
+#' \item{survived}{survival status}
+#' \item{pclass}{Passenger Class}
+#' \item{name}{Name}
+#' \item{sex}{Sex}
+#' \item{age}{Age}
+#' \item{sib_sp}{Number of Siblings/Spouses Aboard}
+#' \item{parch}{Number of Parents/Children Aboard}
+#' \item{ticket}{Ticket Number}
+#' \item{fare}{Passenger Fare}
+#' \item{cabin}{Cabin}
+#' \item{embarked}{Port of Embarkation}
+#' 
+#' ...
+#' }
+#' @source titanic package, https://www.kaggle.com/c/titanic/data
+"passengers"
 ```
 
-usethis::use_data() on an object prepares a .rda file and saves it in 'data' folder.
-
-
-### What's inside, B. Making data available to package users.
-
-Then we need to make data available to users.  We do this in the R folder, in a file called datasets_export.
+titanic is an R package containing data sets providing information on the fate of passengers on the fatal maiden voyage of the ocean liner "Titanic", with variables such as economic status (class), sex, age and survival. These data sets are often used as an introduction to machine learning on Kaggle. More details about the competition can be found here, and the original data sets can be found here.
 
 ```{r}
-export <- readLines("R/dataset_export.R")
-```
-
-Quoting these here:
-
-```{r, code = export, eval = F}
+knitrExtra::chunk_to_dir("data_documentation", dir = "R")
 ```
 
 
----
-
-### What's inside C.  The rest of the architecture. 
-
-Ultimately you'll have a fair number of files supporting the project.  I'm using fs::dir_tree() to have a look at all the project files.
-
-```{r, comment = ''}
-fs::dir_tree(recurse = T)
+```{r, eval = F}
+devtools::document()
+devtools::check()
+devtools::install(".", upgrade = "never")
+devtools::submit_cran()
 ```
 
-See details on how [here](https://evamaerey.github.io/package_in_20_minutes/package_in_20_minutes#step-00-press-play-on-the-video-guide).  The good news is, you only have to edit 'Description', 'readme.Rmd' and the files that have the .R extension (the two quoted above)!
-
-In this workshop, we'll see that:
-
-- usethis::create_package() helps us create the basic package architecture
-- devtools::document() creates the man folder and the .Rd files
-- usethis::use_readme_rmd() helps us create the readme file (then we 'knit' to create the .md version)
-- usethis::use_data() on an object prepares a .rda file and saves it in 'data'
-... more to add...
 
 
-## Step 4. Check and take your package for a spin!
-
-## Step 5. Done! Celebrate!
-
-## Step 6. Think about outreach, CRAN, and futher development
-
-Particularly impactful data packages usually do more to get the word out about the work they do.  In the package repository, more work and items may be included to support this.  Check out {palmerpenguins} and {gapminder} to see this. You also might want to get your package on CRAN!
-
-Check out the work that was done in {palmerpenguins} for comparison, in this [fork](https://github.com/EvaMaeRey/palmerpenguins), with the readme modified to highlight data prep and delivery and package structure.
