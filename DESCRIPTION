@@ -1,12 +1,12 @@
 Package: tidytitanic
-Title: Data package with tidy, flat versions of R Titanic data
+Title: Data package with tidy and flat versions of R Titanic data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Evangeline",
            family = "Reynolds",
            role = c("aut", "cre"),
            email = "evangeline.mae@gmail.com")
-Description: This package gives you that 'tidy data' based on the Titanic data from 'datasets' in R.
+Description: This package gives you that 'tidy data' based on the Titanic data from 'datasets' in R and based on kaggle data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -233,4 +233,5 @@ knitrExtra::chunk_to_dir("data_documentation", dir = "R")
 devtools::document()
 devtools::check()
 devtools::install(".", upgrade = "never")
+devtools::submit_cran()
 ```
