@@ -70,8 +70,11 @@ tidy_titanic <- Titanic |>
 usethis::use_data(tidy_titanic, overwrite = T)
 
 
-passengers <- bind_rows(titanic::titanic_train, 
-          titanic::titanic_test) |>
+passengers <-  
+  dplyr::bind_rows(titanic::titanic_train, 
+                   titanic::titanic_test |> 
+                     dplyr::left_join(titanic::titanic_gender_model)
+          ) |>
   janitor::clean_names() 
 
 usethis::use_data(passengers, overwrite = T)

@@ -1,12 +1,12 @@
 Package: tidytitanic
-Title: Data package with tidy and flat versions of R Titanic data
+Title: Dataframes Based on Titanic Passengers and Crew
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Evangeline",
            family = "Reynolds",
            role = c("aut", "cre"),
            email = "evangeline.mae@gmail.com")
-Description: This package gives you that 'tidy data' based on the Titanic data from 'datasets' in R and based on kaggle data.
+Description: Titanic dataframes and as well as passenger detail dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
