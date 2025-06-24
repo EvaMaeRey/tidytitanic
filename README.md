@@ -121,7 +121,7 @@ library(tidyverse)
 #> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 #> ✔ dplyr     1.1.4          ✔ readr     2.1.5     
 #> ✔ forcats   1.0.0          ✔ stringr   1.5.1     
-#> ✔ ggplot2   3.5.1.9000     ✔ tibble    3.2.1     
+#> ✔ ggplot2   3.5.2.9000     ✔ tibble    3.2.1     
 #> ✔ lubridate 1.9.3          ✔ tidyr     1.3.1     
 #> ✔ purrr     1.0.2          
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
@@ -141,9 +141,34 @@ usethis::use_data(tidy_titanic, overwrite = T)
 #> • Document your data (see 'https://r-pkgs.org/data.html')
 
 
-passengers <- bind_rows(titanic::titanic_train, 
-          titanic::titanic_test) |>
-  janitor::clean_names() 
+passengers <-  
+  dplyr::bind_rows(titanic::titanic_train, 
+                   titanic::titanic_test |> 
+                     dplyr::left_join(titanic::titanic_gender_model)
+          ) |>
+  janitor::clean_names() |>
+  select(name, everything()) |>
+  mutate(prefered_name = str_match(name, '\\"(.+?)\\"')[,2], .before = 1) |>
+  mutate(prefered_name = ifelse(prefered_name == ")", NA, prefered_name)) |>
+  mutate(name = name |> str_replace("\"\\)\"", ")"), .before = 1) |>
+  mutate(maiden_name = name |> 
+           str_extract("\\(.+") |> 
+           str_remove_all("\\(|\\)"),
+         .before = 1) |>
+  mutate(maiden_name = ifelse(str_detect(name, "Mrs. "), maiden_name, NA)) |>
+
+  mutate(maiden_name = ifelse(maiden_name == prefered_name & !is.na(prefered_name), NA, maiden_name)) |>
+  mutate(first_name = name |> str_extract("(?<=\\.\\s)\\w+"), .before = 1) |>
+  mutate(first_name = maiden_name |> str_extract("\\w+") %>% ifelse(!is.na(maiden_name), ., first_name), 
+         ) |>
+  mutate(last_name = name |> 
+           str_extract(".+?,") |> 
+           str_remove(","), .before = 1) |>
+  mutate(title = name |> str_match(", (.+?) ") |> _[,2] |> str_replace("the", "Countess."), .before = 1) |>
+  select(passenger_id, title, last_name, first_name, survived, pclass, sex, age, 
+         sib_sp, parch, fare, cabin, embarked, ticket,  maiden_name,  name, prefered_name)
+#> Joining with `by = join_by(PassengerId)`
+
 
 usethis::use_data(passengers, overwrite = T)
 #> ✔ Saving 'passengers' to 'data/passengers.rda'
@@ -157,7 +182,7 @@ usethis::use_data(passengers, overwrite = T)
 
 #' Tallied characteristics
 #'
-#' A dataset tallying frequencies of titanic passenger characteristics based on Titanic data from base R.  Includes Crew
+#' A dataset tallying frequencies of titanic passenger characteristics based on Titanic data from datasets.  Includes Crew
 #'
 #' @format A data frame with 32 rows and 5 variables:
 #' \describe{
@@ -175,7 +200,7 @@ usethis::use_data(passengers, overwrite = T)
 
 #' 
 #'
-#' A dataset titanic passengers and characteristics based on Titanic data from base R.  Includes Crew
+#' A dataset titanic passengers and characteristics based on Titanic data fromdatasets.  Includes Crew
 #'
 #' @format A data frame with 2201 rows and 5 variables:
 #' \describe{
@@ -192,23 +217,28 @@ usethis::use_data(passengers, overwrite = T)
 #> [1] "tidy_titanic"
 
 
-
 #' Titanic test data.
 #'
 #' @format Data frame with columns
 #' \describe{
 #' \item{passenger_id}{Passenger ID}
+#' \item{title}{Passenger title}
+#' \item{last_name}{Passenger last name}
+#' \item{first_name}{Passenger first name}
 #' \item{survived}{survival status}
 #' \item{pclass}{Passenger Class}
-#' \item{name}{Name}
 #' \item{sex}{Sex}
 #' \item{age}{Age}
 #' \item{sib_sp}{Number of Siblings/Spouses Aboard}
 #' \item{parch}{Number of Parents/Children Aboard}
-#' \item{ticket}{Ticket Number}
 #' \item{fare}{Passenger Fare}
 #' \item{cabin}{Cabin}
 #' \item{embarked}{Port of Embarkation}
+#' \item{ticket}{Ticket Number}
+#' \item{maiden_name}{Maiden name}
+#' \item{name}{Full name}
+#' \item{prefered_name}{Prefered name}
+#' 
 #' 
 #' ...
 #' }
@@ -217,12 +247,112 @@ usethis::use_data(passengers, overwrite = T)
 #> [1] "passengers"
 ```
 
-titanic is an R package containing data sets providing information on
-the fate of passengers on the fatal maiden voyage of the ocean liner
-“Titanic”, with variables such as economic status (class), sex, age and
-survival. These data sets are often used as an introduction to machine
-learning on Kaggle. More details about the competition can be found
-here, and the original data sets can be found here.
+> titanic is an R package containing data sets providing information on
+> the fate of passengers on the fatal maiden voyage of the ocean liner
+> “Titanic”, with variables such as economic status (class), sex, age
+> and survival. These data sets are often used as an introduction to
+> machine learning on Kaggle. More details about the competition can be
+> found here, and the original data sets can be found here.
+
+``` r
+
+library(tidytitanic)
+library(tidyverse)
+
+passengers |>
+  mutate(id = row_number()) |>
+  sample_n(30) |>
+  ggplot() + 
+  aes(x = survived, 
+      group = id,
+      fill = sex) + 
+  geom_bar() + 
+  stat_count(geom = "text", 
+             aes(label = first_name),
+             vjust = 1)
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+``` r
+scale_y_logistic <- function(...){
+  
+  scale_y_continuous(breaks = 0:5/5, ...)
+}
+
+geom_smooth_logistic <- function(formula = y ~ x, ...){
+  
+  list(geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = TRUE, ...),
+       scale_y_logistic(),
+       theme(panel.grid.major.y = element_line()))
+                          
+ }
+
+geom_jitter_logistic <- function(...){
+  
+  geom_jitter(width = 0, 
+              height = .1, 
+              alpha = .1, ...)
+  
+}
+
+compute_layer_logistic <- function(data, ..., formula = y ~ x){
+  
+  model <- glm(formula = formula, family = "binomial")
+  
+  x_as_numeric <- data_x |> as.numeric()
+  
+  fitted(model, seq(min(x_as_numeric), max(x_as_numeric)))
+  
+}
+
+
+ggchalkboard::theme_chalkboard(base_size = 15) |> theme_set()
+
+library(ggplyr)
+tidytitanic::passengers |> 
+  ggplot() + 
+  aes(pclass, survived) + 
+  geom_jitter_logistic() + 
+  facet_wrap(~sex) + 
+  geom_smooth_logistic() + intercept() +
+  aes(x = fare)  + intercept() + 
+  data_filter(fare < 500) + intercept() 
+#> p1
+#> p2
+#> p3
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+``` r
+  NULL 
+#> NULL
+  
+library(patchwork) 
+#> Warning: package 'patchwork' was built under R version 4.4.1
+p1 / p2 / p3
+#> `geom_smooth()` using formula = 'y ~ x'
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 1 row containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_point()`).
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" />
+
+``` r
+
+
+# ggplot(cars) + 
+#   aes(speed, dist, other = dist > mean(dist), group = 1) + 
+#   geom_polygon()
+```
 
 ``` r
 knitrExtra::chunk_to_dir("data_documentation", dir = "R")

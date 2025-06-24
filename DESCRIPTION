@@ -1,12 +1,12 @@
 Package: tidytitanic
 Title: Dataframes Based on Titanic Passengers and Crew
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "Evangeline",
            family = "Reynolds",
            role = c("aut", "cre"),
            email = "evangeline.mae@gmail.com")
-Description: Titanic dataframes and as well as passenger detail dataset.
+Description: The tidytitanic package provides a version of the Titanic data tailored for people analytics demonstrations and practice. Unlike other packages such as titanic, which reproduce the Kaggle competition files with minimal preprocessing, tidytitanic combines and tidies the train and test datasets into a single unified dataset, `passengers`, facilitating exploration across the full set of individuals. It also extracts meaningful personal identifiers—such as first names, last names, and titles—from the raw Name field, enabling richer demographic analysis and grouping. The `passengers` data does not cover the crew, however.  Therefore the package also provides a flat and uncounted version of the `Titanic` dataset which contains crew information for futher practice. This human-centered data package is designed to support exploratory data analysis, feature engineering, and pedagogical use cases.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
